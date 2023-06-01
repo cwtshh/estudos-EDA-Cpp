@@ -118,7 +118,7 @@ int main() {
         cout << endl;
     }
 
-    file.close();
+
 
     cout << "\n";
 
@@ -140,6 +140,8 @@ int main() {
 
     cout << "1 - Estado encontrado: " << dataCollection[pos].estado << endl;
     cout << "2 - Estado encontrado: " << dataCollection[pos2].estado << endl;
+
+    file.close();
 
 
     delete[] dataCollection;
