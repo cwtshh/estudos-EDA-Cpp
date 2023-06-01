@@ -8,28 +8,6 @@
 
 using namespace std;
 
-int separa(int v[], int p, int r) {
-    int c = v[r];
-    int t, j = p;
-    for(int k = p; k < r; k++) {
-        if(v[k] <= c) {
-            t = v[j], v[j] = v[k], v[k] = t;
-            j++;
-        }
-
-    }
-    t = v[j], v[j] = v[r], v[r] = t;
-    return j;
-}
-
-void quickSort(int v[], int p, int r) {
-    if(p < r) {
-        int j = separa(v, p, r);
-        quickSort(v, p, j - 1);
-        quickSort(v, j + 1, r);
-    }
-}
-
 class CsvLine{
     public:
         int time;
@@ -49,29 +27,40 @@ class CsvLine{
             cout << "Length: " << length << endl;
             cout << "Delay: " << delay << endl;
         };
+
+        string toString() {
+            string line = to_string(time)+ "," + to_string(length) + "," + to_string(delay);
+            return line;
+        };
 };
+
+int separa1(CsvLine v[], int p, int r) {
+    int c = v[r].time;
+    int t, j = p;
+    for(int k = p; k < r; k++) {
+        if(v[k].time <= c) {
+            t = v[j].time, v[j].time = v[k].time, v[k].time = t;
+            j++;
+        }
+
+    }
+    t = v[j].time, v[j].time = v[r].time, v[r].time = t;
+    return j;
+}
+
+void quickSorts(CsvLine v[], int p, int r) {
+    if(p < r) {
+        int j = separa1(v, p, r);
+        quickSorts(v, p, j - 1);
+        quickSorts(v, j + 1, r);
+    }
+}
+
 
 int main() {
 
     ifstream file;
     file.open("D:\\Airlines.csv");
-
-    string firtstline = "id,Airline,Flight,AirportFrom,AirportTo,DayOfWeek,Time,Length,Delay";
-
-    cout << sizeof("id,Airline,Flight,AirportFrom,AirportTo,DayOfWeek,Time,Length,Delay") << endl;
-
-    cout << sizeof("539383,US,1442,LAX,PHL,5") << endl;
-
-    cout << "Tamanho do 300:" <<sizeof("300") << endl;
-
-
-   /*  char *TimeBuffer = new char[100]; */
-    char firstLine[68];
-    char time[4];
-
-    /* 5, 2, 4, 3, 3, 1, 4, 3, 1 */
-
-    /* 25 bytes para pular */
 
     if(!file){
         cout << "Erro ao abrir o arquivo" << endl;
@@ -133,30 +122,27 @@ int main() {
         i++;
     }
 
-
-    cout << "Ordenando o vetor..." << endl;
-    clock_t tStart = clock();
-    quickSort(data->time, 0, 539384 - 1);
-    printf("Time taken: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
-
-    ofstream outfile;
-    outfile.open("D:\\AirlinesSorted.csv");
-
-    for(int i = 0; i < 539384; i++) {
-        outfile << timeV[i] << endl;
+    for(int i = 0; i < 5; i++) {
+        data[i].showLine();
     }
 
 
+    cout << "Ordenando o vetor..." << endl;
+    clock_t tStart = clock();
+    quickSorts(data, 0, 539384 - 1);
+    printf("Time taken: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+
+    ofstream outfile;
+    outfile.open("D:\\AirlinesSortedByTime.csv");
+
+    outfile << "Time,Length,Delay" << endl;
+    for(int i = 0; i < 539384; i++) {
+        outfile << data[i].toString() << endl;
+    }
+
     file.close();
-    delete[] timeV;
+/*     delete[] timeV; */
     delete [] data;
-
-
-
-    
-
-
-
 
     return 0;
 }
