@@ -34,8 +34,8 @@ class CsvLine{
 };
 
 void checkPercentage(int delayCount, int totalCount) {
-    float percentage = (float)delayCount / (float)totalCount;
-    cout << "Percentage of delayed flights: " << percentage * 100 << "%" << endl;
+    float percentage = delayCount * 100 / totalCount;
+    cout << "Percentage of delayed flights: " << percentage << "%" << endl;
 }
 
 void isRelated(CsvLine v[]) {
