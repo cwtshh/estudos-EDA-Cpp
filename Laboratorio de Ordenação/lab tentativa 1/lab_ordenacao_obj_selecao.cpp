@@ -33,25 +33,22 @@ class CsvLine{
         };
 };
 
-int separa1(CsvLine v[], int p, int r) {
-    int c = v[r].time;
-    int t, j = p;
-    for(int k = p; k < r; k++) {
-        if(v[k].time <= c) {
-            t = v[j].time, v[j].time = v[k].time, v[k].time = t;
-            j++;
+int smallerIndex(CsvLine v[], int tam, int ini) {
+    int min = ini, j;
+    for(j = ini + 1; j < tam; j++) {
+        if(v[j].time < v[min].time) {
+            min = j;
         }
-
     }
-    t = v[j].time, v[j].time = v[r].time, v[r].time = t;
-    return j;
 }
 
-void quickSorts(CsvLine v[], int p, int r) {
-    if(p < r) {
-        int j = separa1(v, p, r);
-        quickSorts(v, p, j - 1);
-        quickSorts(v, j + 1, r);
+void selectionSort(CsvLine v[], int tam) {
+    int i, min, aux;
+
+    for(i = 0; i < tam; i++) {
+        min = smallerIndex(v, tam, i);
+        aux = v[i].time;
+        v[min].time = aux;
     }
 }
 
@@ -128,16 +125,9 @@ int main() {
 
     cout << "Ordenando o vetor..." << endl;
     clock_t tStart = clock();
-    quickSorts(data, 0, 539384 - 1);
+    selectionSort(data, 539384);
     printf("Time taken: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
 
-    ofstream outfile;
-    outfile.open("D:\\AirlinesSortedByTime.csv");
-
-    outfile << "Time,Length,Delay" << endl;
-    for(int i = 0; i < 539384; i++) {
-        outfile << data[i].toString() << endl;
-    }
 
     file.close();
 /*     delete[] timeV; */

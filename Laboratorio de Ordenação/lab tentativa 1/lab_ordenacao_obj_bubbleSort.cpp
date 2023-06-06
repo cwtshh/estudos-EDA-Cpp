@@ -33,25 +33,15 @@ class CsvLine{
         };
 };
 
-int separa1(CsvLine v[], int p, int r) {
-    int c = v[r].time;
-    int t, j = p;
-    for(int k = p; k < r; k++) {
-        if(v[k].time <= c) {
-            t = v[j].time, v[j].time = v[k].time, v[k].time = t;
-            j++;
+void bubbleSort(CsvLine v[], int tam) {
+    int i, j, temp;
+
+    for(i = tam; i > 0; i--) {
+        if(v[i].time < v[i - 1].time) {
+            temp = v[i].time;
+            v[i].time = v[i - 1].time;
+            v[i - 1].time = temp;
         }
-
-    }
-    t = v[j].time, v[j].time = v[r].time, v[r].time = t;
-    return j;
-}
-
-void quickSorts(CsvLine v[], int p, int r) {
-    if(p < r) {
-        int j = separa1(v, p, r);
-        quickSorts(v, p, j - 1);
-        quickSorts(v, j + 1, r);
     }
 }
 
@@ -65,9 +55,6 @@ int main() {
         cout << "Erro ao abrir o arquivo" << endl;
         return 1;
     }
-
-    cout << sizeof(char) << "\n";
-    cout << sizeof(int) << "\n";
 
     CsvLine *data = new CsvLine[539384];
 
@@ -121,23 +108,15 @@ int main() {
         i++;
     }
 
-    for(int i = 0; i < 5; i++) {
-        data[i].showLine();
+    for(int j = 0; j < 5; j++) {
+       data[j].showLine();
     }
-
 
     cout << "Ordenando o vetor..." << endl;
     clock_t tStart = clock();
-    quickSorts(data, 0, 539384 - 1);
+    bubbleSort(data, 539384);
     printf("Time taken: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
 
-    ofstream outfile;
-    outfile.open("D:\\AirlinesSortedByTime.csv");
-
-    outfile << "Time,Length,Delay" << endl;
-    for(int i = 0; i < 539384; i++) {
-        outfile << data[i].toString() << endl;
-    }
 
     file.close();
 /*     delete[] timeV; */

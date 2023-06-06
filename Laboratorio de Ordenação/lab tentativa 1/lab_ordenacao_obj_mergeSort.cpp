@@ -33,25 +33,38 @@ class CsvLine{
         };
 };
 
-int separa1(CsvLine v[], int p, int r) {
-    int c = v[r].time;
-    int t, j = p;
-    for(int k = p; k < r; k++) {
-        if(v[k].time <= c) {
-            t = v[j].time, v[j].time = v[k].time, v[k].time = t;
-            j++;
-        }
+void intercala(int p, int q, int r, CsvLine v[]) {
+    int *w;
+    w = new int[r - p];
+    int i = p, j = q;
+    int k = 0;
 
+    while(i < q && j < r) {
+        if(v[i].time <= v[j].time) {
+            w[k++] = v[i++].time;
+        } else {
+            w[k++] = v[j++].time;
+        }
     }
-    t = v[j].time, v[j].time = v[r].time, v[r].time = t;
-    return j;
+
+    while(i < q) {
+        w[k++] = v[i++].time;
+    }
+    while(j < r) {
+        w[k++] = v[j++].time;
+    }
+    for(i = p; i < r; i++) {
+        v[i].time = w[i - p];
+    }
+    delete[] w;
 }
 
-void quickSorts(CsvLine v[], int p, int r) {
-    if(p < r) {
-        int j = separa1(v, p, r);
-        quickSorts(v, p, j - 1);
-        quickSorts(v, j + 1, r);
+void mergeSort(int p, int r, CsvLine v[]) {
+    if(p < r - 1) {
+        int q = (p + r) / 2;
+        mergeSort(p, q, v);
+        mergeSort(q, r, v);
+        intercala(p, q, r, v);
     }
 }
 
@@ -128,18 +141,18 @@ int main() {
 
     cout << "Ordenando o vetor..." << endl;
     clock_t tStart = clock();
-    quickSorts(data, 0, 539384 - 1);
+    mergeSort(0, 539384, data);
     printf("Time taken: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
 
-    ofstream outfile;
-    outfile.open("D:\\AirlinesSortedByTime.csv");
 
-    outfile << "Time,Length,Delay" << endl;
-    for(int i = 0; i < 539384; i++) {
-        outfile << data[i].toString() << endl;
+    ofstream outputFile;
+    outputFile.open("D:\\Airlines_mergeSort.csv");
+    for(int j = 0; i < 539384; i++) {
+        outputFile << data[i].toString() << endl;
     }
 
     file.close();
+    outputFile.close();
 /*     delete[] timeV; */
     delete [] data;
 

@@ -55,6 +55,84 @@ void quickSorts(CsvLine v[], int p, int r) {
     }
 }
 
+int smallerIndex(CsvLine v[], int tam, int ini) {
+    int min = ini, j;
+    for(j = ini + 1; j < tam; j++) {
+        if(v[j].time < v[min].time) {
+            min = j;
+        }
+    }
+}
+
+void selectionSort(CsvLine v[], int tam) {
+    int i, min, aux;
+
+    for(i = 0; i < tam; i++) {
+        min = smallerIndex(v, tam, i);
+        aux = v[i].time;
+        v[min].time = aux;
+    }
+}
+
+void insertionSort(CsvLine v[], int n) {
+    int i, j;
+    int next;
+    for(i = 1; i < n; i++) {
+        next = v[i].time;
+        for(j = i - 1; j>= 0 && next < v[j].time; j--) {
+            v[j + 1].time = v[j].time;
+        }
+        v[j + 1].time = next;
+    }
+}
+
+void bubbleSort(CsvLine v[], int tam) {
+    int i, j, temp;
+    for(i = tam; i < 0; i--) {
+        for(j = 0; j < i; j++) {
+            if(v[j].time > v[j + 1].time) {
+                temp = v[j].time;
+                v[j + 1].time = temp;
+            }
+        }
+    }
+}
+
+void intercala(int p, int q, int r, CsvLine v[]) {
+    int *w;
+    w = new int[r - p];
+    int i = p, j = q;
+    int k = 0;
+
+    while(i < q && j < r) {
+        if(v[i].time <= v[j].time) {
+            w[k++] = v[i++].time;
+        } else {
+            w[k++] = v[j++].time;
+        }
+    }
+
+    while(i < q) {
+        w[k++] = v[i++].time;
+    }
+    while(j < r) {
+        w[k++] = v[j++].time;
+    }
+    for(i = p; i < r; i++) {
+        v[i].time = w[i - p];
+    }
+    delete[] w;
+}
+
+void mergeSort(int p, int r, CsvLine v[]) {
+    if(p < r - 1) {
+        int q = (p + r) / 2;
+        mergeSort(p, q, v);
+        mergeSort(q, r, v);
+        intercala(p, q, r, v);
+    }
+}
+
 
 int main() {
 
@@ -126,18 +204,20 @@ int main() {
     }
 
 
-    cout << "Ordenando o vetor..." << endl;
+    cout << "Ordenando o vetor...(quickSort)" << endl;
     clock_t tStart = clock();
     quickSorts(data, 0, 539384 - 1);
     printf("Time taken: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
 
-    ofstream outfile;
-    outfile.open("D:\\AirlinesSortedByTime.csv");
 
-    outfile << "Time,Length,Delay" << endl;
-    for(int i = 0; i < 539384; i++) {
-        outfile << data[i].toString() << endl;
-    }
+    cout << "Ordenando o vetor...(selectionSort)" << endl;
+    clock_t tStart2 = clock();
+    selectionSort(data, 539384);
+    printf("Time taken: %.2fs\n", (double)(clock() - tStart2)/CLOCKS_PER_SEC);
+
+    
+
+
 
     file.close();
 /*     delete[] timeV; */
