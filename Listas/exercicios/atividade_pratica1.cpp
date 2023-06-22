@@ -39,6 +39,8 @@ class NoC {
         NoC *Ant;
         NoC *Prox;
 
+        NoC(){};
+
         NoC(Cadastro *Dados, NoC *Prox, NoC *Ant) {
             this->Dados = Dados;
             this->Prox = Prox;
@@ -74,6 +76,7 @@ class Descritor {
         NoS *Inicio;
         int Tamanho;
         NoS *Fim;
+        
 
         Descritor(NoS *Inicio, int Tamanho, NoS *Fim) {
             this->Inicio = Inicio;
@@ -123,13 +126,13 @@ NoC *incluiCaldaComercio(NoC *Clista, string CNPJ, string RazaoSocial, string Ci
 }
 
 
-void carregarDados() {
+NoC *carregarDados() {
      /* Abre o arquivo e dispara erro caso ocorra algum problema */
     ifstream comercio_arquivo;
     comercio_arquivo.open("comercio.txt");
     if(!comercio_arquivo) {
         cout << "Erro ao abrir o arquivo" << endl;
-        return;
+        return NULL;
     }
 
     /* Abre o arquivo e dispara erro caso ocorra algum problema */
@@ -137,7 +140,7 @@ void carregarDados() {
     industria_arquivo.open("industria.txt");
     if(!industria_arquivo) {
         cout << "Erro ao abrir o arquivo" << endl;
-        return;
+        return NULL;
     }
 
     /* Abre o arquivo e dispara erro caso ocorra algum problema */
@@ -145,7 +148,7 @@ void carregarDados() {
     servico_arquivo.open("servico.txt");
     if(!servico_arquivo) {
         cout << "Erro ao abrir o arquivo" << endl;
-        return;
+        return NULL;
     }
     
     /* Cadastro dos comercios */
@@ -165,20 +168,18 @@ void carregarDados() {
         getline(inputString, cidade, ' ');
         getline(inputString, fone, ' ');
 
-        if(count == 0) {
-            incluiCabecaComercio(Clista, cnpj, razao_social, cidade, fone);
-        } else {
-            incluiCaldaComercio(Clista, cnpj, razao_social, cidade, fone);
-        }
-        
+        incluiCaldaComercio(Clista, cnpj, razao_social, cidade, fone);
         count = 1;
 
         cout << cnpj << " " << razao_social << " " << cidade << " " << fone << endl;
+
     }
 
     comercio_arquivo.close();
     industria_arquivo.close();
     servico_arquivo.close();
+
+    return Clista;
 }
 
 void menu() {
@@ -190,7 +191,7 @@ void menu() {
 
 int main() {
 
-    ListaComercio *CLista = new ListaComercio(NULL);
+    NoC *Clista;
 
 
     int option;
@@ -203,8 +204,12 @@ int main() {
 
         switch(option){
             case 1:
-                carregarDados();
+                Clista = carregarDados();
+                cout << Clista->Prox->Dados->CNPJ << endl;
+                cout << Clista->Prox->Prox->Prox->Dados->CNPJ << endl;
                 break;
+
+                
         }
     }
 
