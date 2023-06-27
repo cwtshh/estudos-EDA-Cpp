@@ -24,10 +24,12 @@ class Cadastro {
 
 class NoI {
     public:
-        int Dados;
+        Cadastro *Dados;
         NoI *Prox;
 
-        NoI(int Dados, NoI *Prox) {
+        NoI(){}
+
+        NoI(Cadastro *Dados, NoI *Prox) {
             this->Dados = Dados;
             this->Prox = Prox;
         }
@@ -77,7 +79,6 @@ class Descritor {
         int Tamanho;
         NoS *Fim;
         
-
         Descritor(NoS *Inicio, int Tamanho, NoS *Fim) {
             this->Inicio = Inicio;
             this->Tamanho = Tamanho;
@@ -98,20 +99,10 @@ void incluiCabecaComercio(NoC *Clista, string CNPJ, string RazaoSocial, string C
 }
 
 NoC *incluiCaldaComercio(NoC *Clista, string CNPJ, string RazaoSocial, string Cidade, string Fone) {
-    /* Cadastro *cadastro = new Cadastro(CNPJ, RazaoSocial, Cidade, Fone);
-    NoC *noAux;
-    NoC *no = new NoC(cadastro, NULL, NULL);
-    noAux = Clista;
-
-    while(noAux->Prox != NULL) {
-       noAux = noAux->Prox;
-    }
-    noAux->Prox = no;
-    return Clista; */
-
     if(Clista == NULL) {
         Cadastro *cadastro = new Cadastro(CNPJ, RazaoSocial, Cidade, Fone);
         NoC *no = new NoC(cadastro, no, no);
+        Clista = no;
         return Clista;
     } else {
         NoC *noAux = Clista;
@@ -126,16 +117,27 @@ NoC *incluiCaldaComercio(NoC *Clista, string CNPJ, string RazaoSocial, string Ci
 }
 
 
-NoC *carregarDados() {
-     /* Abre o arquivo e dispara erro caso ocorra algum problema */
-    ifstream comercio_arquivo;
-    comercio_arquivo.open("comercio.txt");
-    if(!comercio_arquivo) {
-        cout << "Erro ao abrir o arquivo" << endl;
-        return NULL;
-    }
+// INDUSTRIAS
 
-    /* Abre o arquivo e dispara erro caso ocorra algum problema */
+NoI *incluiCaldaIndustria(NoI *Llista, string cnpj, string razao_social, string cidade, string fone) {
+    if(Llista == NULL) {
+        Cadastro *cadastro = new Cadastro(cnpj, razao_social, cidade, fone);
+        NoI *no = new NoI(cadastro, NULL);
+        Llista = no;
+        return Llista;
+    } else {
+        NoI *noAux = Llista;
+        while(noAux->Prox != NULL) {
+            noAux = noAux->Prox;
+        }
+        Cadastro *cadastro = new Cadastro(cnpj, razao_social, cidade, fone);
+        NoI *noNovo = new NoI(cadastro, NULL);
+        noAux->Prox = noNovo;
+        return Llista;
+    }
+}
+
+NoI *carregarDadosIndustria() {
     ifstream industria_arquivo;
     industria_arquivo.open("industria.txt");
     if(!industria_arquivo) {
@@ -143,17 +145,38 @@ NoC *carregarDados() {
         return NULL;
     }
 
-    /* Abre o arquivo e dispara erro caso ocorra algum problema */
-    ifstream servico_arquivo;
-    servico_arquivo.open("servico.txt");
-    if(!servico_arquivo) {
+    string line = "";
+
+    NoI *Llista = new NoI(NULL, NULL);
+    
+    while(getline(industria_arquivo, line)) {
+        string cnpj, razao_social, cidade, fone;
+
+        stringstream inputString(line);
+
+        getline(inputString, cnpj, ' ');
+        getline(inputString, razao_social, ' ');
+        getline(inputString, cidade, ' ');
+        getline(inputString, fone, ' ');
+
+        incluiCaldaIndustria(Llista, cnpj, razao_social, cidade, fone);
+    }
+
+    return Llista;
+}
+
+
+NoC *carregarDadosComercio() {
+     /* Abre o arquivo e dispara erro caso ocorra algum problema */
+    ifstream comercio_arquivo;
+    comercio_arquivo.open("comercio.txt");
+    if(!comercio_arquivo) {
         cout << "Erro ao abrir o arquivo" << endl;
         return NULL;
     }
     
     /* Cadastro dos comercios */
     string line = "";
-    int count = 0;
 
     NoC *Clista = new NoC(NULL, NULL, NULL);
 
@@ -169,22 +192,17 @@ NoC *carregarDados() {
         getline(inputString, fone, ' ');
 
         incluiCaldaComercio(Clista, cnpj, razao_social, cidade, fone);
-        count = 1;
-
-        cout << cnpj << " " << razao_social << " " << cidade << " " << fone << endl;
-
     }
 
     comercio_arquivo.close();
-    industria_arquivo.close();
-    servico_arquivo.close();
 
     return Clista;
 }
 
 void menu() {
-    cout << "|| Secretaria da Fazenda - Distrito Federal ||" << "\n";
-    cout << "|| 1 - Carregar dados                      ||" << "\n";
+    cout << "|| - Secretaria da Fazenda - Distrito Federal - ||" << "\n";
+    cout << "|| 1 - Carregar dados                           ||" << "\n";
+    cout << "|| 2 - Relatorio - Industrias                   ||" << "\n";
 }
 
 
@@ -192,6 +210,7 @@ void menu() {
 int main() {
 
     NoC *Clista;
+    NoI *Llista;
 
 
     int option;
@@ -204,11 +223,17 @@ int main() {
 
         switch(option){
             case 1:
-                Clista = carregarDados();
-                cout << Clista->Prox->Dados->CNPJ << endl;
-                cout << Clista->Prox->Prox->Prox->Dados->CNPJ << endl;
+                Clista = carregarDadosComercio();
+                Llista = carregarDadosIndustria();
+
+                cout << Llista->Dados->CNPJ << endl;
+                cout << Llista->Prox->Dados->CNPJ << endl;
+                cout << Llista->Prox->Prox->Dados->CNPJ << endl;
+                
                 break;
 
+            case 2:
+                cout << "Funcao nao implementada" << "\n";
                 
         }
     }
