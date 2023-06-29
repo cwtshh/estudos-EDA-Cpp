@@ -79,9 +79,8 @@ class Descritor {
 };
 
 // METODOS DE SERVICO
-NoS *incluiCaldaServico(NoS *sLista, string cnpj, string razaoSocial, string cidade, string fone) {
+void incluiCaldaServico(NoS *sLista, Descritor *descritor, string cnpj, string razaoSocial, string cidade, string fone) {
     NoS *pNovoNoS, *pAux;
-    Descritor *descritor;
 
     Cadastro *cadastro = new Cadastro(cnpj, razaoSocial, cidade, fone);
 
@@ -90,12 +89,12 @@ NoS *incluiCaldaServico(NoS *sLista, string cnpj, string razaoSocial, string cid
         pNovoNoS->Ant = NULL;
         pNovoNoS->Prox = NULL;
 
-        descritor->Inicio = pNovoNoS;
-        descritor->Tamanho = 1;
-        descritor->Fim = pNovoNoS;
-
         sLista = pNovoNoS;
-        return sLista;
+
+        descritor->Inicio = sLista;
+        descritor->Tamanho = 1;
+        descritor->Fim = sLista;
+        
     } else {
         pAux = sLista;
         while(pAux->Prox != NULL) {
@@ -110,12 +109,10 @@ NoS *incluiCaldaServico(NoS *sLista, string cnpj, string razaoSocial, string cid
         descritor->Inicio = sLista;
         descritor->Fim = pNovoNoS;
         descritor->Tamanho++;
-
-        return sLista;
     }
 }
 
-NoS *carregarDadosServicos() {
+void carregarDadosServicos(NoS *sLista, Descritor *descritor) {
     ifstream servicos_arquivo;
     servicos_arquivo.open("servicos.txt");
     if(!servicos_arquivo) {
@@ -124,8 +121,6 @@ NoS *carregarDadosServicos() {
     }
 
     string line = "";
-
-    NoS *sLista = NULL;
 
     while(getline(servicos_arquivo, line)) {
         string cnpj, razaoSocial, cidade, fone;
@@ -137,7 +132,7 @@ NoS *carregarDadosServicos() {
         getline(inputString, cidade, ' ');
         getline(inputString, fone, ' ');
 
-        
+        incluiCaldaServico(sLista, descritor, cnpj, razaoSocial, cidade, fone);
     }
 }
 
@@ -223,28 +218,6 @@ NoC *incluiCaldaComercio(NoC *cLista, string cnpj, string razaoSocial, string ci
     return cLista;
 }
 
-
-/* NoC *incluiCaldaComercio(NoC *cLista, string cnpj, string razaoSocial, string cidade, string fone) {
-    NoC *pNovoNoC, *pAux;
-    Cadastro *cadastro = new Cadastro(cnpj, razaoSocial, cidade, fone);
-
-    if(cLista == NULL) {
-        pNovoNoC = new NoC(cadastro, pNovoNoC, pNovoNoC);
-        cLista = pNovoNoC;
-        return cLista;
-    } else {
-        pAux = cLista;
-        while(pAux->Prox != cLista) {
-            pAux = pAux->Prox;
-            cout << "checando elemento..." << endl;
-        }
-        pNovoNoC = new NoC(cadastro, cLista, pAux);
-        pAux->Prox = pNovoNoC;
-        return cLista;
-    }
-    
-} */
-
 NoC *carregarDadosComercio() {
     ifstream comercio_arquivo;
     comercio_arquivo.open("comercio.txt");
@@ -281,6 +254,8 @@ void menu() {
     cout << "|| 2 - Gerar Lista Unificada                    ||" << "\n";
     cout << "|| 3 - Relatorio - Industrias                   ||" << "\n";
     cout << "|| 4 - Relatorio - Comercios                    ||" << "\n";
+    cout << "|| 5 - Relatorio - Servicos                     ||" << "\n";
+    cout << "|| 10 - Apagar Listas                           ||" << "\n";
     cout << "|| 0 - Sair                                     ||" << "\n";
 }
 
@@ -316,6 +291,47 @@ void printComercios(NoC *cLista) {
 
 }
 
+void printServicos(NoS *sLista) {
+    NoS *pAuxS;
+    pAuxS = sLista;
+
+    while(pAuxS->Prox != NULL) {
+        cout << "CNPJ: " << pAuxS->Dados->CNPJ << "\n";
+        cout << "Razao Social: " << pAuxS->Dados->RazaoSocial << "\n";
+        cout << "Cidade: " << pAuxS->Dados->Cidade << "\n";
+        cout << "Telefone: " << pAuxS->Dados->Fone << "\n";
+        cout << "\n";
+
+        pAuxS = pAuxS->Prox;
+    }
+}
+
+
+NoI *deletarIndustrias(NoI *iLista) {
+    NoI *pAuxiProx = iLista;
+    NoI *pAuxAtual = NULL;
+    while(pAuxiProx->Prox != NULL) {
+        pAuxAtual = pAuxiProx;
+        pAuxiProx = pAuxiProx->Prox;
+        delete[] pAuxAtual;
+    }
+    iLista = NULL;
+    return iLista;
+}
+
+NoC *deletarComercio(NoC *cLista) {
+    NoC *pAuxcProx = cLista;
+    NoC *pAuxcAtual = NULL;
+    while(pAuxcProx->Prox != cLista) {
+        pAuxcAtual = pAuxcProx;
+        pAuxcProx = pAuxcProx->Prox;
+        delete[] pAuxcAtual;
+    }
+
+    cLista = NULL;
+    return cLista;
+}
+
 
 
 int main() {
@@ -323,6 +339,8 @@ int main() {
 
     NoI *iLista = NULL;
     NoC *cLista = NULL;
+    NoS *sLista = NULL;
+    Descritor *descritor = new Descritor(NULL, 0, NULL);
 
     int option;
     while( option != 0 ) {
@@ -336,6 +354,7 @@ int main() {
                 cout << "Carregando dados..." << "\n";
                 iLista = carregarDadosIndustria();
                 cLista = carregarDadosComercio();
+                carregarDadosServicos(sLista, descritor);
 
                 break;
 
@@ -360,9 +379,34 @@ int main() {
                     break;
                 }
                 printComercios(cLista);
+                break;
+
+            case 5:
+                cout << "Relatorio - Servicos" << "\n";
+
+                if(descritor->Inicio == NULL && descritor->Fim == NULL) {
+                    cout << "Nao ha sercivos cadastrados" << "\n";
+                    cout << "Carregue os dados ou reinicie o programa" << "\n";
+                    break;
+                }
+                printServicos(sLista);
+                break;
+
+            case 10:
+                cout << "Apagando listas..." << "\n";
+
+                if(iLista == NULL || cLista == NULL) {
+                    cout << "Nao ha listas para apagar" << "\n";
+                    break;
+                }
+
+                iLista = deletarIndustrias(iLista);
+                cLista = deletarComercio(cLista);
+                break;
+
 
             case 0:
-                cout << "Sair" << "\n";
+                cout << "Saindo..." << "\n";
                 break;
         }
 
