@@ -49,6 +49,7 @@ class NoC {
         }
 };
 
+// SERVICOS
 class NoS {
     public:
         Cadastro *Dados;
@@ -67,6 +68,8 @@ class Descritor {
         NoS *Inicio;
         int Tamanho;
         NoS *Fim;
+
+        Descritor(){}
         
         Descritor(NoS *Inicio, int Tamanho, NoS *Fim) {
             this->Inicio = Inicio;
@@ -75,12 +78,79 @@ class Descritor {
         }
 };
 
+// METODOS DE SERVICO
+NoS *incluiCaldaServico(NoS *sLista, string cnpj, string razaoSocial, string cidade, string fone) {
+    NoS *pNovoNoS, *pAux;
+    Descritor *descritor;
+
+    Cadastro *cadastro = new Cadastro(cnpj, razaoSocial, cidade, fone);
+
+    if(sLista == NULL) {
+        pNovoNoS->Dados = cadastro;
+        pNovoNoS->Ant = NULL;
+        pNovoNoS->Prox = NULL;
+
+        descritor->Inicio = pNovoNoS;
+        descritor->Tamanho = 1;
+        descritor->Fim = pNovoNoS;
+
+        sLista = pNovoNoS;
+        return sLista;
+    } else {
+        pAux = sLista;
+        while(pAux->Prox != NULL) {
+            pAux = pAux->Prox;
+        }
+        pNovoNoS->Dados = cadastro;
+        pNovoNoS->Ant = pAux;
+        pNovoNoS->Prox = NULL;
+
+        pAux->Prox = pNovoNoS;
+
+        descritor->Inicio = sLista;
+        descritor->Fim = pNovoNoS;
+        descritor->Tamanho++;
+
+        return sLista;
+    }
+}
+
+NoS *carregarDadosServicos() {
+    ifstream servicos_arquivo;
+    servicos_arquivo.open("servicos.txt");
+    if(!servicos_arquivo) {
+        cout << "Erro ao abrir o arquivo" << endl;
+        return NULL;
+    }
+
+    string line = "";
+
+    NoS *sLista = NULL;
+
+    while(getline(servicos_arquivo, line)) {
+        string cnpj, razaoSocial, cidade, fone;
+
+        stringstream inputString(line);
+
+        getline(inputString, cnpj, ' ');
+        getline(inputString, razaoSocial, ' ');
+        getline(inputString, cidade, ' ');
+        getline(inputString, fone, ' ');
+
+        
+    }
+}
+
+
+
+
+
 // INDUSTRIA
 NoI *incluiCaldaIndustria(NoI *iLista, string cnpj, string razaoSocial, string cidade, string fone) {
     NoI *pNovoNoI, *pAux;
 
     Cadastro *cadastro = new Cadastro(cnpj, razaoSocial, cidade, fone);
-    pNovoNoI = new NoI(cadastro, NULL);
+    pNovoNoI = new NoI(cadastro, nullptr);
 
     if(iLista == NULL) {
         iLista = pNovoNoI;
@@ -126,6 +196,34 @@ NoI *carregarDadosIndustria() {
 }
 
 // COMERCIO
+
+NoC *incluiCaldaComercio(NoC *cLista, string cnpj, string razaoSocial, string cidade, string fone) {
+    NoC *pAux;
+    Cadastro *cadastro = new Cadastro(cnpj, razaoSocial, cidade, fone);
+
+    if(cLista == NULL) {   
+        NoC *pNovoNoC = new NoC(cadastro, NULL, NULL);
+        pNovoNoC->Ant = pNovoNoC;
+        pNovoNoC->Prox = pNovoNoC;
+
+        cLista = pNovoNoC;
+        return cLista;
+    }
+
+    pAux = cLista;
+    while(pAux->Prox != cLista) {
+        /* cout << pAux->Dados->CNPJ << endl; */
+        pAux = pAux->Prox;
+    }
+    NoC *pNovoNoC = new NoC(cadastro, NULL, NULL);
+    pAux->Prox = pNovoNoC;
+    pNovoNoC->Ant = pAux;
+    pNovoNoC->Prox = cLista;
+    
+    return cLista;
+}
+
+
 /* NoC *incluiCaldaComercio(NoC *cLista, string cnpj, string razaoSocial, string cidade, string fone) {
     NoC *pNovoNoC, *pAux;
     Cadastro *cadastro = new Cadastro(cnpj, razaoSocial, cidade, fone);
@@ -147,7 +245,7 @@ NoI *carregarDadosIndustria() {
     
 } */
 
-/* NoC *carregarDadosComercio() {
+NoC *carregarDadosComercio() {
     ifstream comercio_arquivo;
     comercio_arquivo.open("comercio.txt");
     if(!comercio_arquivo) {
@@ -174,7 +272,6 @@ NoI *carregarDadosIndustria() {
     comercio_arquivo.close();
     return cLista;
 }
- */
 
 
 
@@ -183,7 +280,40 @@ void menu() {
     cout << "|| 1 - Carregar dados                           ||" << "\n";
     cout << "|| 2 - Gerar Lista Unificada                    ||" << "\n";
     cout << "|| 3 - Relatorio - Industrias                   ||" << "\n";
+    cout << "|| 4 - Relatorio - Comercios                    ||" << "\n";
     cout << "|| 0 - Sair                                     ||" << "\n";
+}
+
+void printIndustrias(NoI *iLista) {
+    NoI *pAux;
+    pAux = iLista;
+    
+    while(pAux->Prox != NULL) {
+        cout << "CNPJ: " << pAux->Dados->CNPJ << "\n";
+        cout << "Razao Social: " << pAux->Dados->RazaoSocial << "\n";
+        cout << "Cidade: " << pAux->Dados->Cidade << "\n";
+        cout << "Telefone: " << pAux->Dados->Fone << "\n";
+        cout << "\n";
+
+        pAux = pAux->Prox;
+    }
+
+}
+
+void printComercios(NoC *cLista) {
+    NoC *pAuxC;
+    pAuxC = cLista;
+
+    while(pAuxC->Prox != cLista) {
+        cout << "CNPJ: " << pAuxC->Dados->CNPJ << "\n";
+        cout << "Razao Social: " << pAuxC->Dados->RazaoSocial << "\n";
+        cout << "Cidade: " << pAuxC->Dados->Cidade << "\n";
+        cout << "Telefone: " << pAuxC->Dados->Fone << "\n";
+        cout << "\n";
+
+        pAuxC = pAuxC->Prox;
+    }
+
 }
 
 
@@ -192,7 +322,8 @@ int main() {
 
 
     NoI *iLista = NULL;
-    /* NoC *cLista; */
+    NoC *cLista = NULL;
+
     int option;
     while( option != 0 ) {
         menu();
@@ -204,7 +335,7 @@ int main() {
             case 1:
                 cout << "Carregando dados..." << "\n";
                 iLista = carregarDadosIndustria();
-                /* cLista = carregarDadosComercio(); */
+                cLista = carregarDadosComercio();
 
                 break;
 
@@ -214,22 +345,21 @@ int main() {
                 if(iLista == NULL) {
                     cout << "Nâo ha industrias cadastradas" << "\n";
                     cout << "Carregue os dados ou reinicie o programa" << "\n";
-                    cout << "Carregue os dados ou reinicie o programa" << "\n";
                     break;
                 }
 
-                NoI *pAux;
-                pAux = iLista;
-                while(pAux->Prox != NULL) {
-                    cout << "CNPJ: " << pAux->Dados->CNPJ << "\n";
-                    cout << "Razao Social: " << pAux->Dados->RazaoSocial << "\n";
-                    cout << "Cidade: " << pAux->Dados->Cidade << "\n";
-                    cout << "Telefone: " << pAux->Dados->Fone << "\n";
-                    cout << "\n";
-
-                    pAux = pAux->Prox;
-                }
+                printIndustrias(iLista);
                 break;
+
+            case 4:
+               cout << "Relatorio - Comercio" << "\n";
+
+               if(cLista == NULL) {
+                    cout << "Nao ha comercios cadastrados" << "\n";
+                    cout << "Carregue os dados ou reinicie o programa" << "\n";
+                    break;
+                }
+                printComercios(cLista);
 
             case 0:
                 cout << "Sair" << "\n";
