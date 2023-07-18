@@ -117,7 +117,7 @@ void carregarDadosServicos(NoS *sLista, Descritor *descritor) {
     servicos_arquivo.open("servicos.txt");
     if(!servicos_arquivo) {
         cout << "Erro ao abrir o arquivo" << endl;
-        return NULL;
+        return;
     }
 
     string line = "";
@@ -326,6 +326,7 @@ NoC *deletarComercio(NoC *cLista) {
         pAuxcAtual = pAuxcProx;
         pAuxcProx = pAuxcProx->Prox;
         delete[] pAuxcAtual;
+        pAuxcAtual = NULL;
     }
 
     cLista = NULL;
